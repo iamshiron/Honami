@@ -33,11 +33,30 @@ public class HonamiApp(Router router, WebApplication webApp) {
     }
 
     public void PrintRouteTree() {
-        foreach (var method in Router.Endpoints) {
-            Console.WriteLine($"HTTP Method: {method.Key}");
-            foreach (var route in method.Value) {
-                Console.WriteLine($"  Path: {route.Key}");
-            }
+        foreach (var (method, root) in Router.Endpoints) {
+            Console.WriteLine($"HTTP Method: {method}");
+            PrintTreeNode(root, "  ");
+        }
+    }
+
+    private static void PrintTreeNode(RouteTreeNode node, string indent) {
+        var segmentDisplay = node.Segment.Type switch {
+            RouteSegmentType.Dynamic => $"[{node.Segment.Name}]",
+            _ => node.Segment.Name
+        };
+
+        if (node.Callback != null) {
+            Console.WriteLine($"{indent}/{segmentDisplay} *");
+        } else {
+            Console.WriteLine($"{indent}/{segmentDisplay}");
+        }
+
+        foreach (var child in node.StaticChildren) {
+            PrintTreeNode(child, indent + "  ");
+        }
+
+        if (node.ParameterChild != null) {
+            PrintTreeNode(node.ParameterChild, indent + "  ");
         }
     }
 }
