@@ -1,13 +1,15 @@
-﻿namespace Shiron.Honami.Routes;
+﻿using Shiron.Honami.HTTP.Results;
+
+namespace Shiron.Honami.Routes;
 
 public interface IRoute {
-    void Get();
-    void Post();
-    void Put();
-    void Delete();
-    void Patch();
-    void Head();
-    void Options();
-    void Trace();
-    void Connect();
+    IResult Get();
+    IResult Post();
+    IResult Put();
+    IResult Delete();
+    IResult Patch();
+    IResult Head();
+    IResult Options();
+    IResult Trace();
+    IResult Connect();
 }

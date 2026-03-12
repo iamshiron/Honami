@@ -1,9 +1,16 @@
-﻿using Shiron.Honami.Routes;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Shiron.Honami.Routes;
 
 namespace Shiron.Honami;
 
 public class HonamiAppBuilder {
     private readonly RouteBuilder _routeBuilder = new();
+    private readonly WebApplicationBuilder _webBuilder;
+
+    public HonamiAppBuilder() {
+        _webBuilder = WebApplication.CreateBuilder();
+    }
 
     public HonamiAppBuilder RegisterRoute(string path, IRoute route) {
         _routeBuilder.AddRoute(path, route);
@@ -11,6 +18,6 @@ public class HonamiAppBuilder {
     }
 
     public HonamiApp Build() {
-        return new HonamiApp(_routeBuilder.Build());
+        return new HonamiApp(_routeBuilder.Build(), _webBuilder.Build());
     }
 }

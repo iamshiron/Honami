@@ -1,22 +1,33 @@
-﻿namespace Shiron.Honami.Routes;
+﻿using Shiron.Honami.HTTP.Results;
+
+namespace Shiron.Honami.Routes;
 
 public class ServerRoute : IRoute {
-    public virtual void Get() {
+    public virtual IResult Get() {
+        throw new NotImplementedException();
     }
-    public virtual void Post() {
+    public virtual IResult Post() {
+        throw new NotImplementedException();
     }
-    public virtual void Put() {
+    public virtual IResult Put() {
+        throw new NotImplementedException();
     }
-    public virtual void Delete() {
+    public virtual IResult Delete() {
+        throw new NotImplementedException();
     }
-    public virtual void Patch() {
+    public virtual IResult Patch() {
+        throw new NotImplementedException();
     }
-    public virtual void Head() {
+    public virtual IResult Head() {
+        throw new NotImplementedException();
     }
-    public virtual void Options() {
+    public virtual IResult Options() {
+        throw new NotImplementedException();
     }
-    public virtual void Trace() {
+    public virtual IResult Trace() {
+        throw new NotImplementedException();
     }
-    public virtual void Connect() {
+    public virtual IResult Connect() {
+        throw new NotImplementedException();
     }
 }
