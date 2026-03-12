@@ -7,7 +7,14 @@ using Results = Microsoft.AspNetCore.Http.Results;
 
 namespace Shiron.Honami.Routes;
 
-public readonly record struct RouteCallback(IRoutes Instance, MethodInfo Method);
+public readonly struct RouteCallback(IRoutes instance, MethodInfo method) {
+    private readonly object _instance = instance;
+    private readonly RouteHandlerDelegate _handler = RouteCompiler.CompileRoute(instance.GetType(), method);
+
+    public HonamiResult Execute() {
+        return _handler(_instance);
+    }
+}
 
 public class Router {
     public Dictionary<HTTPMethod, Dictionary<string, RouteCallback>> Endpoints { get; } = new() {
@@ -54,11 +61,7 @@ public class Router {
             throw new RouterNotFoundException(path, method.Value);
         }
 
-        var result = (HonamiResult?) callback.Method.Invoke(callback.Instance, null);
-        if (!result.HasValue) {
-            throw new RouterInvalidResultException(callback.Instance, callback.Method);
-        }
-
-        return result.Value;
+        var result = callback.Execute();
+        return result;
     }
 }
