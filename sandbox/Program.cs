@@ -1,4 +1,4 @@
-﻿using Shiron.Honami;
+using Shiron.Honami;
 using Shiron.Honami.Sandbox.Routes.API.Users;
 
 var builder = new HonamiAppBuilder();

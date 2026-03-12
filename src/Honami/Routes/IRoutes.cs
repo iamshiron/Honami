@@ -1,15 +1,15 @@
-﻿using Shiron.Honami.HTTP.Results;
+using Shiron.Honami.HTTP.Results;
 
 namespace Shiron.Honami.Routes;
 
 public interface IRoutes {
-    IHonamiResult Get();
-    IHonamiResult Post();
-    IHonamiResult Put();
-    IHonamiResult Delete();
-    IHonamiResult Patch();
-    IHonamiResult Head();
-    IHonamiResult Options();
-    IHonamiResult Trace();
-    IHonamiResult Connect();
+    HonamiResult Get();
+    HonamiResult Post();
+    HonamiResult Put();
+    HonamiResult Delete();
+    HonamiResult Patch();
+    HonamiResult Head();
+    HonamiResult Options();
+    HonamiResult Trace();
+    HonamiResult Connect();
 }

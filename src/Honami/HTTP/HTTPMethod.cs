@@ -1,4 +1,4 @@
-﻿namespace Shiron.Honami.HTTP;
+namespace Shiron.Honami.HTTP;
 
 public enum HTTPMethod {
     Get,

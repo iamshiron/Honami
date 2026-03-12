@@ -38,7 +38,7 @@ public class Router {
         }
     }
 
-    public IHonamiResult Match(HttpContext context) {
+    public HonamiResult Match(HttpContext context) {
         var path = context.Request.Path;
         var methodString = context.Request.Method;
 
@@ -54,11 +54,11 @@ public class Router {
             throw new RouterNotFoundException(path, method.Value);
         }
 
-        var result = (IHonamiResult?) callback.Method.Invoke(callback.Instance, null);
-        if (result == null) {
+        var result = (HonamiResult?) callback.Method.Invoke(callback.Instance, null);
+        if (!result.HasValue) {
             throw new RouterInvalidResultException(callback.Instance, callback.Method);
         }
 
-        return result;
+        return result.Value;
     }
 }

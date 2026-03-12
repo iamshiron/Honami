@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Shiron.Honami.HTTP;
 using Shiron.Honami.Routes;
 

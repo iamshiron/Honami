@@ -1,4 +1,4 @@
-﻿namespace Shiron.Honami.Routes;
+namespace Shiron.Honami.Routes;
 
 public class RouteBuilder {
     private readonly Dictionary<string, IRoutes> _routes = [];
