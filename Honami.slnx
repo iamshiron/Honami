@@ -3,6 +3,7 @@
     <Project Path="sandbox/Shiron.Honami.Sandbox.csproj" />
   </Folder>
   <Folder Name="/src/">
+    <Project Path="src/Benchmarks/Shiron.Honami.Benchmarks.csproj" />
     <Project Path="src/CLI/Shiron.Honami.CLI.csproj" />
     <Project Path="src/Honami/Shiron.Honami.csproj" />
   </Folder>

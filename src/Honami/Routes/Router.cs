@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Microsoft.AspNetCore.Http;
 using Shiron.Honami.Exceptions;
 using Shiron.Honami.HTTP;
@@ -17,13 +17,14 @@ public class Router {
         [HTTPMethod.Delete] = [],
         [HTTPMethod.Patch] = [],
         [HTTPMethod.Head] = [],
-        [HTTPMethod.Options] = []
+        [HTTPMethod.Options] = [],
+        [HTTPMethod.Trace] = [],
+        [HTTPMethod.Connect] = []
     };
 
     public Router(Dictionary<string, IRoutes> routes) {
         foreach (var (path, route) in routes) {
             var type = route.GetType();
-            Console.WriteLine(route.GetType().FullName);
             foreach (var httpMethod in HTTPMethods.All) {
                 var httpMethodName = httpMethod.ToString();
                 var method = type.GetMethod(httpMethodName);
