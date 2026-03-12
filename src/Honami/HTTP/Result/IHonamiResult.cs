@@ -2,7 +2,7 @@ using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 
-namespace Shiron.Honami.HTTP.Results;
+namespace Shiron.Honami.HTTP.Result;
 
 public enum ResultType {
     Json,

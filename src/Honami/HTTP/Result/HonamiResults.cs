@@ -1,4 +1,4 @@
-namespace Shiron.Honami.HTTP.Results;
+namespace Shiron.Honami.HTTP.Result;
 
 public static class HonamiResults {
     public static HonamiResult Ok(string message) {

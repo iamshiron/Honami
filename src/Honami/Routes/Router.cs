@@ -2,7 +2,8 @@ using System.Reflection;
 using Microsoft.AspNetCore.Http;
 using Shiron.Honami.Exceptions;
 using Shiron.Honami.HTTP;
-using Shiron.Honami.HTTP.Results;
+using Shiron.Honami.HTTP.Request;
+using Shiron.Honami.HTTP.Result;
 
 namespace Shiron.Honami.Routes;
 
@@ -10,8 +11,8 @@ public readonly struct RouteCallback(IRoutes instance, MethodInfo method) {
     private readonly object _instance = instance;
     private readonly RouteHandlerDelegate _handler = RouteCompiler.CompileRoute(instance.GetType(), method);
 
-    public HonamiResult Execute() {
-        return _handler(_instance);
+    public HonamiResult Execute(HonamiRequest request) {
+        return _handler(_instance, request);
     }
 }
 
@@ -204,15 +205,19 @@ public class Router {
             throw new RouterNotFoundException(path, method.Value);
         }
 
+        HonamiRequest request;
         if (paramCount > 0) {
             var routeParams = new Dictionary<string, string>(paramCount);
             for (var i = 0; i < paramCount; i++) {
                 routeParams[paramNames![i]] = paramValues![i];
             }
-            context.Items["RouteParams"] = routeParams;
+            request = new HonamiRequest(routeParams);
+        } else {
+            request = new HonamiRequest([]);
         }
 
-        return callback.Execute();
+        context.Items["HonamiRequest"] = request;
+        return callback.Execute(request);
     }
 
     private static bool TryMatch(
