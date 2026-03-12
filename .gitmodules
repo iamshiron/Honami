@@ -1,0 +1,4 @@
+[submodule "docs/templates/tokyo_night/public"]
+	path = docs/templates/tokyo_night/public
+	url = https://github.com/iamshiron/Docfx-tokyo-night
+	branch = main

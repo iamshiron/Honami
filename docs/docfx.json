@@ -1,0 +1,38 @@
+{
+    "$schema": "https://raw.githubusercontent.com/dotnet/docfx/main/schemas/docfx.schema.json",
+    "metadata": [
+        {
+            "src": [
+                {
+                    "files": ["**/*.csproj"],
+                    "exclude": ["**/bin/**", "**/obj/**"],
+                    "src": "../src/"
+                }
+            ],
+            "output": "api"
+        }
+    ],
+    "build": {
+        "content": [
+            {
+                "files": ["**/*.{md,yml}"],
+                "exclude": ["_site/**"]
+            }
+        ],
+        "resource": [
+            {
+                "files": ["images/**"]
+            }
+        ],
+        "output": "_site",
+        "xref": ["https://iamshiron.github.io/lib/xrefmap.yml"],
+        "template": ["default", "modern", "templates/tokyo_night"],
+        "globalMetadata": {
+            "_appName": "Honami",
+            "_appTitle": "Honami",
+            "_appFooter": "© 2026 Shiron",
+            "_enableSearch": true,
+            "pdf": false
+        }
+    }
+}
