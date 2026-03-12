@@ -3,11 +3,11 @@ using Shiron.Honami.Routes;
 
 namespace Shiron.Honami.Sandbox.Routes.API.Users;
 
-public class Server : ServerRoute {
-    public override IResult Get() {
+public class Server : ServerRoutes {
+    public override IHonamiResult Get() {
         Console.WriteLine("Get route called!");
 
-        return Results.Ok(new {
+        return HonamiResults.Ok(new {
             message = "Hello Honami!"
         });
     }

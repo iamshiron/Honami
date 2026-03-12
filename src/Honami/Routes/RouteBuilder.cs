@@ -1,10 +1,10 @@
 ﻿namespace Shiron.Honami.Routes;
 
 public class RouteBuilder {
-    private readonly Dictionary<string, IRoute> _routes = [];
+    private readonly Dictionary<string, IRoutes> _routes = [];
 
-    public void AddRoute(string path, IRoute route) {
-        _routes.Add(path, route);
+    public void AddRoute(string path, IRoutes routes) {
+        _routes.Add(path, routes);
     }
 
     public Router Build() {

@@ -2,6 +2,6 @@
 
 namespace Shiron.Honami.HTTP.Results;
 
-public interface IResult {
+public interface IHonamiResult {
     Task ExecuteAsync(HttpContext context);
 }

@@ -12,8 +12,8 @@ public class HonamiAppBuilder {
         _webBuilder = WebApplication.CreateBuilder();
     }
 
-    public HonamiAppBuilder RegisterRoute(string path, IRoute route) {
-        _routeBuilder.AddRoute(path, route);
+    public HonamiAppBuilder RegisterRoute(string path, IRoutes routes) {
+        _routeBuilder.AddRoute(path, routes);
         return this;
     }
 

@@ -24,4 +24,29 @@ public static class HTTPMethods {
         HTTPMethod.Trace,
         HTTPMethod.Connect
     ];
+
+    public static HTTPMethod? FromString(string s) {
+        switch (s.ToLower()) {
+            case "get":
+                return HTTPMethod.Get;
+            case "post":
+                return HTTPMethod.Post;
+            case "put":
+                return HTTPMethod.Put;
+            case "delete":
+                return HTTPMethod.Delete;
+            case "patch":
+                return HTTPMethod.Patch;
+            case "head":
+                return HTTPMethod.Head;
+            case "options":
+                return HTTPMethod.Options;
+            case "trace":
+                return HTTPMethod.Trace;
+            case "connect":
+                return HTTPMethod.Connect;
+            default:
+                return null;
+        }
+    }
 }

@@ -3,11 +3,11 @@ using Microsoft.AspNetCore.Http;
 
 namespace Shiron.Honami.HTTP.Results;
 
-public class JsonResult : IResult {
+public class JsonHonamiResult : IHonamiResult {
     private readonly object _data;
     private readonly int _statusCode;
 
-    public JsonResult(object data, int statusCode) {
+    public JsonHonamiResult(object data, int statusCode) {
         _data = data;
         _statusCode = statusCode;
     }
