@@ -211,9 +211,9 @@ public class Router {
             for (var i = 0; i < paramCount; i++) {
                 routeParams[paramNames![i]] = paramValues![i];
             }
-            request = new HonamiRequest(routeParams);
+            request = new HonamiRequest(routeParams, context.Request.Headers);
         } else {
-            request = new HonamiRequest([]);
+            request = new HonamiRequest([], context.Request.Headers);
         }
 
         context.Items["HonamiRequest"] = request;

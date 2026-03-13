@@ -1,5 +1,8 @@
-﻿namespace Shiron.Honami.HTTP.Request;
+﻿using Microsoft.AspNetCore.Http;
 
-public class HonamiRequest(Dictionary<string, string> urlParams) {
+namespace Shiron.Honami.HTTP.Request;
+
+public class HonamiRequest(Dictionary<string, string> urlParams, IHeaderDictionary headers) {
+    public IHeaderDictionary Headers { get; } = headers;
     public Dictionary<string, string> UrlParams { get; } = urlParams;
 }
