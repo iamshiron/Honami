@@ -1,6 +1,6 @@
 using System.Reflection;
 using Shiron.Honami.HTTP;
-using Shiron.Honami.Routes;
+using Shiron.Honami.Routes.RouteTypes;
 
 namespace Shiron.Honami.Exceptions;
 

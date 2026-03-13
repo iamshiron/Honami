@@ -1,13 +1,17 @@
-namespace Shiron.Honami.Routes;
+namespace Shiron.Honami.Routes.RouteTypes;
 
 public class RouteBuilder {
     private readonly Dictionary<string, IRoutes> _routes = [];
+    private readonly Dictionary<string, ServerMiddleware> _middlewares = [];
 
     public void AddRoute(string path, IRoutes routes) {
         _routes.Add(path, routes);
     }
+    public void AddMiddleware(string path, ServerMiddleware middleware) {
+        _middlewares.Add(path, middleware);
+    }
 
     public Router Build() {
-        return new Router(_routes);
+        return new Router(_routes, _middlewares);
     }
 }

@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Builder;
-using Shiron.Honami.Routes;
+using Shiron.Honami.Routes.RouteTypes;
 
 namespace Shiron.Honami;
 
@@ -13,6 +13,11 @@ public class HonamiAppBuilder {
 
     public HonamiAppBuilder RegisterAPIRoute(string path, IRoutes routes) {
         _routeBuilder.AddRoute(path, routes);
+        return this;
+    }
+
+    public HonamiAppBuilder RegisterMiddleware(string path, ServerMiddleware middleware) {
+        _routeBuilder.AddMiddleware(path, middleware);
         return this;
     }
 

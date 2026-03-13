@@ -5,7 +5,7 @@ using Shiron.Honami.HTTP;
 using Shiron.Honami.HTTP.Request;
 using Shiron.Honami.HTTP.Result;
 
-namespace Shiron.Honami.Routes;
+namespace Shiron.Honami.Routes.RouteTypes;
 
 public readonly struct RouteCallback(IRoutes instance, MethodInfo method) {
     private readonly object _instance = instance;
@@ -140,8 +140,16 @@ file class RouteTreeBuilder {
 
 public class Router {
     public Dictionary<HTTPMethod, RouteTreeNode> Endpoints { get; } = new();
+    private readonly Dictionary<string, ServerMiddleware> _middlewares;
+    private readonly List<(string path, ServerMiddleware middleware)> _middlewareList;
 
-    public Router(Dictionary<string, IRoutes> routes) {
+    public Router(Dictionary<string, IRoutes> routes, Dictionary<string, ServerMiddleware> middlewares) {
+        _middlewares = middlewares;
+        _middlewareList = middlewares
+            .OrderByDescending(kvp => kvp.Key.Length)
+            .Select(kvp => (kvp.Key, kvp.Value))
+            .ToList();
+
         Dictionary<HTTPMethod, Dictionary<string, RouteCallback>> endpoints = new() {
             [HTTPMethod.Get] = [],
             [HTTPMethod.Post] = [],
@@ -184,13 +192,23 @@ public class Router {
         return builder.Build();
     }
 
-    public HonamiResult Match(HttpContext context) {
+    public async Task<HonamiResult> Match(HttpContext context) {
         var path = context.Request.Path.Value ?? "/";
         var methodString = context.Request.Method;
 
         var method = HTTPMethods.FromString(methodString);
         if (!method.HasValue) {
             throw new RouterInvalidHttpMethodException(methodString);
+        }
+
+        HonamiRequest request;
+        foreach (var (middlewarePath, middleware) in _middlewareList) {
+            if (!path.StartsWith(middlewarePath, StringComparison.OrdinalIgnoreCase)) continue;
+
+            var middlewareResult = await middleware.ExecuteAsync(new HonamiRequest([], context.Request.Headers));
+            if (middlewareResult.Type != ResultType.MiddlewarePass) {
+                return middlewareResult;
+            }
         }
 
         if (!Endpoints.TryGetValue(method.Value, out var root)) {
@@ -205,7 +223,6 @@ public class Router {
             throw new RouterNotFoundException(path, method.Value);
         }
 
-        HonamiRequest request;
         if (paramCount > 0) {
             var routeParams = new Dictionary<string, string>(paramCount);
             for (var i = 0; i < paramCount; i++) {

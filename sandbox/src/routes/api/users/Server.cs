@@ -1,6 +1,6 @@
 using Shiron.Honami.HTTP.Request;
 using Shiron.Honami.HTTP.Result;
-using Shiron.Honami.Routes;
+using Shiron.Honami.Routes.RouteTypes;
 
 namespace Shiron.Honami.Sandbox.Routes.API.Users;
 

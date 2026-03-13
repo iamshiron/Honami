@@ -10,7 +10,8 @@ public enum ResultType {
     Utf8Text,
     StatusCodeOnly,
     File,
-    Stream
+    Stream,
+    MiddlewarePass
 }
 
 public readonly record struct HonamiResult(int StatusCode, object? Payload, ResultType Type) {

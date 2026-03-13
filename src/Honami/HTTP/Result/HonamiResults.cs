@@ -26,4 +26,8 @@ public static class HonamiResults {
     public static HonamiResult InternalServerError(object data) {
         return new HonamiResult(500, data, ResultType.Json);
     }
+
+    public static HonamiResult MiddlewarePass() {
+        return new HonamiResult(200, null, ResultType.MiddlewarePass);
+    }
 }

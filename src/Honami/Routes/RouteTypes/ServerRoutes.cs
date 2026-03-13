@@ -1,7 +1,7 @@
 using Shiron.Honami.HTTP.Request;
 using Shiron.Honami.HTTP.Result;
 
-namespace Shiron.Honami.Routes;
+namespace Shiron.Honami.Routes.RouteTypes;
 
 public class ServerRoutes : IRoutes {
     public virtual HonamiResult Get(HonamiRequest request) {

@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Shiron.Honami.Exceptions;
-using Shiron.Honami.Routes;
+using Shiron.Honami.Routes.RouteTypes;
 
 namespace Shiron.Honami;
 
@@ -13,7 +13,7 @@ public class HonamiApp(Router router, WebApplication webApp) {
     public void Run() {
         WebApp.Run(async context => {
             try {
-                var result = Router.Match(context);
+                var result = await Router.Match(context);
                 await result.ExecuteAsync(context);
             } catch (RouterNotFoundException) {
                 context.Response.StatusCode = 404;
