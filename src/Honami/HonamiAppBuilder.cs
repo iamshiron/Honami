@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Builder;
+using Shiron.Honami.Routes;
 using Shiron.Honami.Routes.RouteTypes;
 
 namespace Shiron.Honami;

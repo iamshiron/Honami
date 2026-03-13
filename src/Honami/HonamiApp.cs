@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Shiron.Honami.Exceptions;
-using Shiron.Honami.Routes.RouteTypes;
+using Shiron.Honami.Routes;
 
 namespace Shiron.Honami;
 

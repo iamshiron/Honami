@@ -1,4 +1,4 @@
-namespace Shiron.Honami.Routes.RouteTypes;
+﻿namespace Shiron.Honami.Routes;
 
 public enum RouteSegmentType {
     Literal,

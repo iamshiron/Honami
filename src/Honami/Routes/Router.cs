@@ -4,8 +4,9 @@ using Shiron.Honami.Exceptions;
 using Shiron.Honami.HTTP;
 using Shiron.Honami.HTTP.Request;
 using Shiron.Honami.HTTP.Result;
+using Shiron.Honami.Routes.RouteTypes;
 
-namespace Shiron.Honami.Routes.RouteTypes;
+namespace Shiron.Honami.Routes;
 
 public readonly struct RouteCallback(IRoutes instance, MethodInfo method) {
     private readonly object _instance = instance;

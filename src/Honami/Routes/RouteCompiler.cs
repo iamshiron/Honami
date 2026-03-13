@@ -3,7 +3,7 @@ using System.Reflection;
 using Shiron.Honami.HTTP.Request;
 using Shiron.Honami.HTTP.Result;
 
-namespace Shiron.Honami.Routes.RouteTypes;
+namespace Shiron.Honami.Routes;
 
 public delegate HonamiResult RouteHandlerDelegate(object instance, HonamiRequest request);
 
