@@ -13,17 +13,16 @@ public class HonamiApp(Router router, WebApplication webApp) {
     public void Run() {
         WebApp.Run(async context => {
             try {
-                var result = await Router.Match(context);
-                await result.ExecuteAsync(context);
+                await Router.Match(context);
             } catch (RouterNotFoundException) {
                 context.Response.StatusCode = 404;
                 await context.Response.WriteAsync("Not Found");
             } catch (RouterInvalidHttpMethodException e) {
-                WebApp.Logger.LogError(e, $"Invalid HTTP method: '{e.Method}'");
+                WebApp.Logger.LogError(e, "Invalid HTTP method: '{Method}'", e.Method);
                 context.Response.StatusCode = 400;
                 await context.Response.WriteAsync("Invalid HTTP method");
             } catch (Exception e) {
-                WebApp.Logger.LogError(e, "Unknown exception: {}", e.Message);
+                WebApp.Logger.LogError(e, "Unknown exception: {Message}", e.Message);
                 context.Response.StatusCode = 500;
                 await context.Response.WriteAsync("Internal Server Error");
             }

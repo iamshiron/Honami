@@ -1,19 +1,62 @@
-using System.Reflection;
 using Microsoft.AspNetCore.Http;
 using Shiron.Honami.Exceptions;
 using Shiron.Honami.HTTP;
-using Shiron.Honami.HTTP.Request;
 using Shiron.Honami.HTTP.Result;
 using Shiron.Honami.Routes.RouteTypes;
 
 namespace Shiron.Honami.Routes;
 
-public readonly struct RouteCallback(IRoutes instance, MethodInfo method) {
-    private readonly object _instance = instance;
-    private readonly RouteHandlerDelegate _handler = RouteCompiler.CompileRoute(instance.GetType(), method);
+public readonly struct RouteCallback {
+    private readonly IEndpoint _instance;
+    private readonly RouteHandlerDelegate? _fastHandler;
+    private readonly FlexibleRouteHandlerDelegate? _flexibleHandler;
+    private readonly ServerMiddleware[] _middlewares;
+    private readonly bool _hasResultFilters;
 
-    public HonamiResult Execute(HonamiRequest request) {
-        return _handler(_instance, request);
+    public RouteCallback(
+        IEndpoint instance,
+        RouteHandlerDelegate? fastHandler,
+        FlexibleRouteHandlerDelegate? flexibleHandler,
+        ServerMiddleware[] middlewares
+    ) {
+        _instance = instance;
+        _fastHandler = fastHandler;
+        _flexibleHandler = flexibleHandler;
+        _middlewares = middlewares;
+        _hasResultFilters = middlewares.Any(m => m is IResultFilter);
+    }
+
+    public Task Execute(HttpContext context) {
+        return _hasResultFilters ? ExecuteFlexiblePath(context) : ExecuteFastPath(context);
+    }
+
+    private Task ExecuteFastPath(HttpContext context) {
+        var handler = _fastHandler!;
+        var instance = _instance;
+        var middlewares = _middlewares;
+
+        async Task CoreHandler(HttpContext ctx) => await handler(instance, ctx);
+        MiddlewareDelegate pipeline = CoreHandler;
+
+        for (var i = middlewares.Length - 1; i >= 0; i--) {
+            var middleware = middlewares[i];
+            var currentNext = pipeline;
+            pipeline = ctx => middleware.ExecuteAsync(ctx, currentNext);
+        }
+
+        return pipeline(context);
+    }
+
+    private async Task ExecuteFlexiblePath(HttpContext context) {
+        IHonamiResult result = await _flexibleHandler!(_instance, context);
+
+        foreach (var middleware in _middlewares) {
+            if (middleware is IResultFilter filter) {
+                result = filter.OnResultExecuting(context, result);
+            }
+        }
+
+        await result.ExecuteAsync(context);
     }
 }
 
@@ -141,75 +184,50 @@ file class RouteTreeBuilder {
 
 public class Router {
     public Dictionary<HTTPMethod, RouteTreeNode> Endpoints { get; } = new();
-    private readonly Dictionary<string, ServerMiddleware> _middlewares;
-    private readonly List<(string path, ServerMiddleware middleware)> _middlewareList;
+    private readonly List<(string path, ServerMiddleware middleware)> _middlewares;
 
-    public Router(Dictionary<string, IRoutes> routes, Dictionary<string, ServerMiddleware> middlewares) {
+    public Router(
+        Dictionary<HTTPMethod, Dictionary<string, IEndpoint>> endpoints,
+        List<(string path, ServerMiddleware middleware)> middlewares
+    ) {
         _middlewares = middlewares;
-        _middlewareList = middlewares
-            .OrderByDescending(kvp => kvp.Key.Length)
-            .Select(kvp => (kvp.Key, kvp.Value))
-            .ToList();
 
-        Dictionary<HTTPMethod, Dictionary<string, RouteCallback>> endpoints = new() {
-            [HTTPMethod.Get] = [],
-            [HTTPMethod.Post] = [],
-            [HTTPMethod.Put] = [],
-            [HTTPMethod.Delete] = [],
-            [HTTPMethod.Patch] = [],
-            [HTTPMethod.Head] = [],
-            [HTTPMethod.Options] = [],
-            [HTTPMethod.Trace] = [],
-            [HTTPMethod.Connect] = []
-        };
-
-        foreach (var (path, route) in routes) {
-            var type = route.GetType();
-
-            foreach (var httpMethod in HTTPMethods.All) {
-                var httpMethodName = httpMethod.ToString();
-                var method = type.GetMethod(httpMethodName);
-                if (method == null) continue;
-
-                var implemented = method.DeclaringType == type;
-                if (!implemented || method.IsAbstract) continue;
-
-                endpoints[httpMethod].Add(path, new RouteCallback(route, method));
-            }
-        }
-
-        foreach (var (httpMethod, pathCallbacks) in endpoints) {
-            Endpoints[httpMethod] = BuildTree(pathCallbacks);
+        foreach (var (httpMethod, pathEndpoints) in endpoints) {
+            Endpoints[httpMethod] = BuildTree(pathEndpoints, middlewares);
         }
     }
 
-    private static RouteTreeNode BuildTree(Dictionary<string, RouteCallback> pathCallbacks) {
+    private static RouteTreeNode BuildTree(
+        Dictionary<string, IEndpoint> pathEndpoints,
+        List<(string path, ServerMiddleware middleware)> middlewares
+    ) {
         var builder = new RouteTreeBuilder();
 
-        foreach (var (path, callback) in pathCallbacks) {
+        foreach (var (path, endpoint) in pathEndpoints) {
+            var applicableMiddlewares = middlewares
+                .Where(m => path.StartsWith(m.path, StringComparison.OrdinalIgnoreCase))
+                .Select(m => m.middleware)
+                .ToArray();
+
+            var hasResultFilters = applicableMiddlewares.Any(m => m is IResultFilter);
+
+            var callback = hasResultFilters
+                ? new RouteCallback(endpoint, null, RouteCompiler.CompileFlexiblePath(endpoint.GetType()), applicableMiddlewares)
+                : new RouteCallback(endpoint, RouteCompiler.CompileFastPath(endpoint.GetType()), null, applicableMiddlewares);
+
             builder.AddRoute(path, callback);
         }
 
         return builder.Build();
     }
 
-    public async Task<HonamiResult> Match(HttpContext context) {
+    public async Task Match(HttpContext context) {
         var path = context.Request.Path.Value ?? "/";
         var methodString = context.Request.Method;
 
         var method = HTTPMethods.FromString(methodString);
         if (!method.HasValue) {
             throw new RouterInvalidHttpMethodException(methodString);
-        }
-
-        HonamiRequest request;
-        foreach (var (middlewarePath, middleware) in _middlewareList) {
-            if (!path.StartsWith(middlewarePath, StringComparison.OrdinalIgnoreCase)) continue;
-
-            var middlewareResult = await middleware.ExecuteAsync(new HonamiRequest([], context.Request.Headers));
-            if (middlewareResult.Type != ResultType.MiddlewarePass) {
-                return middlewareResult;
-            }
         }
 
         if (!Endpoints.TryGetValue(method.Value, out var root)) {
@@ -229,13 +247,12 @@ public class Router {
             for (var i = 0; i < paramCount; i++) {
                 routeParams[paramNames![i]] = paramValues![i];
             }
-            request = new HonamiRequest(routeParams, context.Request.Headers);
+            context.Items["RouteParams"] = routeParams;
         } else {
-            request = new HonamiRequest([], context.Request.Headers);
+            context.Items["RouteParams"] = new Dictionary<string, string>();
         }
 
-        context.Items["HonamiRequest"] = request;
-        return callback.Execute(request);
+        await callback.Execute(context);
     }
 
     private static bool TryMatch(

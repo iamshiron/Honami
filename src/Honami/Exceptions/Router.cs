@@ -1,6 +1,4 @@
-using System.Reflection;
 using Shiron.Honami.HTTP;
-using Shiron.Honami.Routes;
 
 namespace Shiron.Honami.Exceptions;
 
@@ -14,10 +12,4 @@ public class RouterNotFoundException(string path, HTTPMethod method) : RouterExc
 
 public class RouterInvalidHttpMethodException(string method) : RouterException($"Invalid HTTP method: {method}") {
     public string Method { get; init; } = method;
-}
-
-public class RouterInvalidResultException(IRoutes Instance, MethodInfo Method)
-    : RouterException($"Invalid result for {Method.Name} in {Instance.GetType().Name}") {
-    public IRoutes Instance { get; init; } = Instance;
-    public MethodInfo Method { get; init; } = Method;
 }

@@ -1,8 +1,9 @@
-using Shiron.Honami.HTTP.Request;
-using Shiron.Honami.HTTP.Result;
+using Microsoft.AspNetCore.Http;
 
 namespace Shiron.Honami.Routes.RouteTypes;
 
+public delegate Task MiddlewareDelegate(HttpContext context);
+
 public abstract class ServerMiddleware {
-    public abstract Task<HonamiResult> ExecuteAsync(HonamiRequest request);
+    public abstract Task ExecuteAsync(HttpContext context, MiddlewareDelegate next);
 }

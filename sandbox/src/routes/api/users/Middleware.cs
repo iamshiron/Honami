@@ -1,13 +1,11 @@
-using Shiron.Honami.HTTP.Request;
-using Shiron.Honami.HTTP.Result;
+using Microsoft.AspNetCore.Http;
 using Shiron.Honami.Routes.RouteTypes;
 
 namespace Shiron.Honami.Sandbox.Routes.API.Users;
 
 public class Middleware : ServerMiddleware {
-    public override Task<HonamiResult> ExecuteAsync(HonamiRequest request) {
-        Console.WriteLine($"Middleware executed!");
-
-        return Task.FromResult(HonamiResults.MiddlewarePass());
+    public override async Task ExecuteAsync(HttpContext context, MiddlewareDelegate next) {
+        Console.WriteLine("Middleware executed!");
+        await next(context);
     }
 }
